@@ -16,6 +16,11 @@
   --color-yellow-bg: #fef3c7;
   --color-green: #15803d;
   --color-green-bg: #dcfce7;
+  --color-warning-bg: #fff7ed;
+  --color-warning-text: #9a3412;
+  /* dataviz 스킬 검증된 카테고리 색상: 1(blue)=AI 활용, 3(aqua)=직접 작성 */
+  --viz-ai: #2a78d6;
+  --viz-self: #1baf7a;
   --radius: 12px;
   --shadow: 0 1px 3px rgba(15, 23, 42, 0.08), 0 1px 2px rgba(15, 23, 42, 0.06);
 }
@@ -472,4 +477,211 @@ a {
 
 .chat-input-row input:focus {
   border-color: var(--color-primary);
+}
+
+/* Alerts (extra) */
+.alert-warning {
+  background: var(--color-warning-bg);
+  color: var(--color-warning-text);
+}
+
+/* Usage log form */
+.usage-log-form h3 {
+  margin-top: 0;
+}
+
+/* Usage ratio bar + timeline (dataviz-validated 2-color categorical palette) */
+.usage-ratio-bar {
+  display: flex;
+  width: 100%;
+  height: 28px;
+  border-radius: 6px;
+  overflow: hidden;
+  background: var(--color-border);
+  gap: 2px;
+}
+
+.usage-ratio-segment {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 12px;
+  font-weight: 700;
+  min-width: 2px;
+  transition: width 0.2s ease;
+}
+
+.usage-ai {
+  background: var(--viz-ai);
+}
+
+.usage-self {
+  background: var(--viz-self);
+}
+
+.usage-legend {
+  display: flex;
+  gap: 20px;
+  margin: 10px 0 20px;
+  font-size: 13px;
+  flex-wrap: wrap;
+}
+
+.usage-legend-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.usage-swatch {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 3px;
+  font-style: normal;
+}
+
+.usage-log-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.usage-log-row {
+  display: flex;
+  gap: 12px;
+  padding: 12px 12px 12px 10px;
+  border-bottom: 1px solid var(--color-border);
+  border-left: 3px solid transparent;
+}
+
+.usage-log-row:last-child {
+  border-bottom: none;
+}
+
+.usage-log-row--ai {
+  border-left-color: var(--viz-ai);
+  background: color-mix(in srgb, var(--viz-ai) 6%, transparent);
+}
+
+.usage-log-row--self {
+  border-left-color: var(--viz-self);
+  background: color-mix(in srgb, var(--viz-self) 6%, transparent);
+}
+
+.usage-log-marker {
+  font-size: 18px;
+  line-height: 1;
+}
+
+.usage-log-body {
+  flex: 1;
+}
+
+.usage-log-meta {
+  font-size: 12px;
+  margin-bottom: 4px;
+}
+
+.usage-log-content {
+  margin: 0;
+  font-size: 14px;
+  white-space: pre-wrap;
+}
+
+.chip-sm {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 1px 7px;
+  border-radius: 999px;
+  color: white;
+}
+
+.chip-sm.usage-ai {
+  background: var(--viz-ai);
+}
+
+.chip-sm.usage-self {
+  background: var(--viz-self);
+}
+
+.chip-sm.usage-pii {
+  background: var(--color-yellow);
+  margin-left: 6px;
+}
+
+/* Quiz */
+.quiz-question {
+  padding: 14px 0;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.quiz-question:last-of-type {
+  border-bottom: none;
+}
+
+.quiz-options {
+  display: flex;
+  gap: 20px;
+  margin-top: 8px;
+}
+
+.quiz-options label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+}
+
+/* Admin stats */
+.stat-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.stat-card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  padding: 16px;
+  box-shadow: var(--shadow);
+}
+
+.stat-card-label {
+  font-size: 12px;
+  color: var(--color-text-muted);
+  margin-bottom: 6px;
+}
+
+.stat-card-value {
+  font-size: 24px;
+  font-weight: 700;
+}
+
+.stat-card-sub {
+  font-size: 11px;
+  color: var(--color-text-muted);
+  margin-top: 2px;
+}
+
+.stat-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.stat-list li {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--color-border);
+  font-size: 14px;
+}
+
+.stat-list li:last-child {
+  border-bottom: none;
 }

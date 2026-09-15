@@ -2,10 +2,11 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 
+from app.core.config import settings
 from app.core.deps import get_current_user
 from app.core.security import create_access_token, hash_password, verify_password
 from app.db.session import get_db
-from app.models.user import User
+from app.models.user import User, UserRole
 from app.schemas.token import Token
 from app.schemas.user import UserCreate, UserRead
 
@@ -18,6 +19,12 @@ def register(payload: UserCreate, db: Session = Depends(get_db)):
     if existing:
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT, detail="이미 등록된 이메일입니다."
+        )
+
+    if payload.role == UserRole.admin and payload.admin_invite_code != settings.ADMIN_INVITE_CODE:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="관리자 가입 코드가 올바르지 않습니다.",
         )
 
     user = User(

@@ -6,14 +6,18 @@ import { LoginPage } from "./pages/LoginPage";
 import { RegisterPage } from "./pages/RegisterPage";
 import { TeacherDashboard } from "./pages/TeacherDashboard";
 import { StudentDashboard } from "./pages/StudentDashboard";
+import { AdminDashboard } from "./pages/AdminDashboard";
 import { AssignmentDetailPage } from "./pages/AssignmentDetailPage";
 import { ChatbotPage } from "./pages/ChatbotPage";
 import { GuidelineManagementPage } from "./pages/GuidelineManagementPage";
+import { QuizPage } from "./pages/QuizPage";
 
 function RoleHome() {
   const { user } = useAuth();
   if (!user) return <Navigate to="/login" replace />;
-  return user.role === "student" ? <StudentDashboard /> : <TeacherDashboard />;
+  if (user.role === "student") return <StudentDashboard />;
+  if (user.role === "admin") return <AdminDashboard />;
+  return <TeacherDashboard />;
 }
 
 export default function App() {
@@ -49,10 +53,26 @@ export default function App() {
             }
           />
           <Route
+            path="/quiz"
+            element={
+              <ProtectedRoute allowedRoles={["student"]}>
+                <QuizPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
             path="/guidelines"
             element={
               <ProtectedRoute allowedRoles={["teacher", "admin"]}>
                 <GuidelineManagementPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin"
+            element={
+              <ProtectedRoute allowedRoles={["admin"]}>
+                <AdminDashboard />
               </ProtectedRoute>
             }
           />

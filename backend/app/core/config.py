@@ -29,5 +29,9 @@ class Settings(BaseSettings):
     # 최상위 유사도가 이 값보다 낮으면 "담당 교사 확인 필요"로 안내합니다.
     CONFIDENCE_THRESHOLD: float = 0.15
 
+    # 관리자(교육청/학교) 계정 가입 시 요구되는 초대 코드. 운영 환경에서는
+    # 반드시 .env에서 무작위 값으로 변경하세요.
+    ADMIN_INVITE_CODE: str = "CHANGE_ME_ADMIN_CODE"
+
 
 settings = Settings()

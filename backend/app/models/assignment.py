@@ -35,3 +35,6 @@ class Assignment(Base):
         back_populates="assignment",
         cascade="all, delete-orphan",
     )
+    usage_logs = relationship(
+        "AiUsageLog", back_populates="assignment", cascade="all, delete-orphan"
+    )

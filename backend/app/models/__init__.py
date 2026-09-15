@@ -7,6 +7,7 @@ from app.models.guideline import (
     GuidelineDocument,
     PolicyComplianceCheck,
 )
+from app.models.usage_log import AiUsageLog, QuizAttempt, UsageEntryType
 from app.models.user import User, UserRole
 
 __all__ = [
@@ -20,4 +21,7 @@ __all__ = [
     "ComplianceStatus",
     "Consent",
     "ChatMessage",
+    "AiUsageLog",
+    "UsageEntryType",
+    "QuizAttempt",
 ]

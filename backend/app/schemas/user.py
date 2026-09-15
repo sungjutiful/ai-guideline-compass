@@ -15,6 +15,7 @@ class UserBase(BaseModel):
 
 class UserCreate(UserBase):
     password: str
+    admin_invite_code: str | None = None
 
     @field_validator("password")
     @classmethod

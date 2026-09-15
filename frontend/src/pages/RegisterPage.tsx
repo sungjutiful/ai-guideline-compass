@@ -12,6 +12,7 @@ export function RegisterPage() {
   const [password, setPassword] = useState("");
   const [studentNumber, setStudentNumber] = useState("");
   const [schoolName, setSchoolName] = useState("");
+  const [adminInviteCode, setAdminInviteCode] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
   const [submitting, setSubmitting] = useState(false);
@@ -28,6 +29,7 @@ export function RegisterPage() {
         role,
         student_number: role === "student" ? studentNumber : undefined,
         school_name: schoolName || undefined,
+        admin_invite_code: role === "admin" ? adminInviteCode : undefined,
       });
       setSuccess(true);
       setTimeout(() => navigate("/login"), 1200);
@@ -55,6 +57,7 @@ export function RegisterPage() {
           <select value={role} onChange={(e) => setRole(e.target.value as UserRole)}>
             <option value="student">학생</option>
             <option value="teacher">교사</option>
+            <option value="admin">관리자(교육청/학교)</option>
           </select>
         </label>
 
@@ -99,6 +102,18 @@ export function RegisterPage() {
           <span>학교명 (선택)</span>
           <input value={schoolName} onChange={(e) => setSchoolName(e.target.value)} />
         </label>
+
+        {role === "admin" && (
+          <label className="field">
+            <span>관리자 가입 코드</span>
+            <input
+              required
+              value={adminInviteCode}
+              onChange={(e) => setAdminInviteCode(e.target.value)}
+              placeholder="담당 부서에서 발급받은 코드"
+            />
+          </label>
+        )}
 
         <button className="btn btn-primary" type="submit" disabled={submitting}>
           {submitting ? "가입 중..." : "회원가입"}

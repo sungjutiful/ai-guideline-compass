@@ -1,8 +1,14 @@
 import { apiClient, TOKEN_STORAGE_KEY } from "./client";
 import type {
+  AdminStats,
   Assignment,
   ChatAskResponse,
   GuidelineDocument,
+  QuizQuestion,
+  QuizStatus,
+  QuizSubmitResult,
+  UsageEntryType,
+  UsageSummary,
   User,
   UserRole,
 } from "../types";
@@ -25,6 +31,7 @@ export interface RegisterPayload {
   role: UserRole;
   student_number?: string;
   school_name?: string;
+  admin_invite_code?: string;
 }
 
 export async function register(payload: RegisterPayload): Promise<User> {
@@ -102,4 +109,45 @@ export async function uploadGuideline(
 export async function askChatbot(question: string): Promise<ChatAskResponse> {
   const { data } = await apiClient.post("/chatbot/ask", { question });
   return data as ChatAskResponse;
+}
+
+export async function createUsageLog(
+  assignmentId: number,
+  entryType: UsageEntryType,
+  content: string,
+  sourceTool?: string
+): Promise<import("../types").UsageLogEntry> {
+  const { data } = await apiClient.post(`/assignments/${assignmentId}/usage-logs`, {
+    entry_type: entryType,
+    content,
+    source_tool: sourceTool || undefined,
+  });
+  return data;
+}
+
+export async function getUsageSummary(assignmentId: number): Promise<UsageSummary> {
+  const { data } = await apiClient.get(`/assignments/${assignmentId}/usage-logs`);
+  return data as UsageSummary;
+}
+
+export async function getQuizQuestions(): Promise<QuizQuestion[]> {
+  const { data } = await apiClient.get("/quiz/questions");
+  return data as QuizQuestion[];
+}
+
+export async function submitQuiz(
+  answers: Record<number, boolean>
+): Promise<QuizSubmitResult> {
+  const { data } = await apiClient.post("/quiz/submit", { answers });
+  return data as QuizSubmitResult;
+}
+
+export async function getQuizStatus(): Promise<QuizStatus> {
+  const { data } = await apiClient.get("/quiz/status");
+  return data as QuizStatus;
+}
+
+export async function getAdminStats(): Promise<AdminStats> {
+  const { data } = await apiClient.get("/admin/stats");
+  return data as AdminStats;
 }

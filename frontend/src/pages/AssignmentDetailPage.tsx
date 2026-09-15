@@ -1,20 +1,36 @@
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
-import { agreeToAssignment, getAssignment } from "../api/endpoints";
+import { Link, useParams } from "react-router-dom";
+import {
+  agreeToAssignment,
+  getAssignment,
+  getUsageSummary,
+} from "../api/endpoints";
 import { extractErrorMessage } from "../api/client";
 import { useAuth } from "../contexts/AuthContext";
 import { PolicyBanner } from "../components/PolicyBanner";
 import { ComplianceList } from "./TeacherDashboard";
-import type { Assignment } from "../types";
+import { UsageTimeline } from "../components/UsageTimeline";
+import { UsageLogForm } from "../components/UsageLogForm";
+import type { Assignment, UsageSummary } from "../types";
 
 export function AssignmentDetailPage() {
   const { id } = useParams<{ id: string }>();
   const { user } = useAuth();
   const [assignment, setAssignment] = useState<Assignment | null>(null);
+  const [usageSummary, setUsageSummary] = useState<UsageSummary | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [needsQuiz, setNeedsQuiz] = useState(false);
   const [agreeing, setAgreeing] = useState(false);
   const [checked, setChecked] = useState(false);
+
+  async function loadUsage(assignmentId: number) {
+    try {
+      setUsageSummary(await getUsageSummary(assignmentId));
+    } catch {
+      // 활용 내역은 부가 정보이므로 조회 실패 시 조용히 무시합니다.
+    }
+  }
 
   async function load() {
     if (!id) return;
@@ -22,6 +38,11 @@ export function AssignmentDetailPage() {
     try {
       const data = await getAssignment(Number(id));
       setAssignment(data);
+      if (data.student_has_consented !== false) {
+        await loadUsage(data.id);
+      } else if (user?.role !== "student") {
+        await loadUsage(data.id);
+      }
     } catch (err) {
       setError(extractErrorMessage(err, "과제를 불러오지 못했습니다."));
     } finally {
@@ -38,22 +59,33 @@ export function AssignmentDetailPage() {
     if (!assignment) return;
     setAgreeing(true);
     setError(null);
+    setNeedsQuiz(false);
     try {
       await agreeToAssignment(assignment.id);
       await load();
     } catch (err) {
-      setError(extractErrorMessage(err, "동의 처리에 실패했습니다."));
+      const message = extractErrorMessage(err, "동의 처리에 실패했습니다.");
+      if (message.includes("사전교육 퀴즈")) {
+        setNeedsQuiz(true);
+      }
+      setError(message);
     } finally {
       setAgreeing(false);
     }
   }
 
   if (loading) return <div className="page">불러오는 중...</div>;
-  if (error) return <div className="page"><div className="alert alert-error">{error}</div></div>;
+  if (error && !assignment)
+    return (
+      <div className="page">
+        <div className="alert alert-error">{error}</div>
+      </div>
+    );
   if (!assignment) return null;
 
   const isStudent = user?.role === "student";
   const needsConsent = isStudent && assignment.student_has_consented === false;
+  const canLogUsage = isStudent && assignment.student_has_consented === true;
 
   return (
     <div className="page">
@@ -81,6 +113,15 @@ export function AssignmentDetailPage() {
             위 기준을 확인했으며, 과제 수행 중 AI 활용 여부와 방식을 이 기준에 따라
             준수하는 데 동의합니다.
           </p>
+
+          {error && <div className="alert alert-error">{error}</div>}
+          {needsQuiz && (
+            <div className="alert alert-warning">
+              사전교육 체크리스트를 먼저 통과해야 동의할 수 있습니다.{" "}
+              <Link to="/quiz">사전교육 하러 가기</Link>
+            </div>
+          )}
+
           <label className="checkbox-field">
             <input
               type="checkbox"
@@ -107,6 +148,19 @@ export function AssignmentDetailPage() {
         <div className="card">
           <h2>가이드라인 자가진단 결과</h2>
           <ComplianceList assignment={assignment} />
+        </div>
+      )}
+
+      {canLogUsage && (
+        <div className="card">
+          <UsageLogForm assignmentId={assignment.id} onLogged={() => loadUsage(assignment.id)} />
+        </div>
+      )}
+
+      {usageSummary && (
+        <div className="card">
+          <h2>AI 활용 이력 타임라인</h2>
+          <UsageTimeline summary={usageSummary} />
         </div>
       )}
     </div>

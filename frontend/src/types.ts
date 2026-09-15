@@ -62,3 +62,56 @@ export interface ChatAskResponse {
 export interface ChatHistoryItem extends ChatAskResponse {
   question: string;
 }
+
+export type UsageEntryType = "ai_prompt" | "ai_response" | "self_written";
+
+export interface UsageLogEntry {
+  id: number;
+  assignment_id: number;
+  student_id: number;
+  student_name?: string | null;
+  entry_type: UsageEntryType;
+  content: string;
+  source_tool?: string | null;
+  pii_detected: boolean;
+  pii_warnings: string[];
+  created_at: string;
+}
+
+export interface UsageSummary {
+  total_entries: number;
+  ai_entries: number;
+  self_written_entries: number;
+  ai_usage_ratio: number;
+  entries: UsageLogEntry[];
+}
+
+export interface QuizQuestion {
+  id: number;
+  question: string;
+}
+
+export interface QuizSubmitResult {
+  score: number;
+  total: number;
+  passed: boolean;
+  correct_answers: Record<string, boolean>;
+  attempted_at: string;
+}
+
+export interface QuizStatus {
+  has_passed: boolean;
+  latest_attempt?: string | null;
+}
+
+export interface AdminStats {
+  user_counts: Record<string, number>;
+  policy_level_counts: Record<string, number>;
+  compliance_status_counts: Record<string, number>;
+  total_assignments: number;
+  total_consents: number;
+  total_guideline_documents: number;
+  total_pii_flags: number;
+  total_quiz_attempts: number;
+  quiz_pass_rate: number;
+}

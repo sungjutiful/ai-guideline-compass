@@ -27,7 +27,11 @@ export function Navbar() {
         <nav className="navbar-links">
           <Link to="/">대시보드</Link>
           <Link to="/chatbot">가이드라인 챗봇</Link>
-          {user.role === "teacher" && <Link to="/guidelines">가이드라인 관리</Link>}
+          {user.role === "student" && <Link to="/quiz">사전교육 체크리스트</Link>}
+          {(user.role === "teacher" || user.role === "admin") && (
+            <Link to="/guidelines">가이드라인 관리</Link>
+          )}
+          {user.role === "admin" && <Link to="/admin">관리자 통계</Link>}
         </nav>
         <div className="navbar-user">
           <span className="badge badge-role">{ROLE_LABEL[user.role]}</span>
