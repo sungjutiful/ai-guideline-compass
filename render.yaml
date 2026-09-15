@@ -1,0 +1,47 @@
+databases:
+  - name: ai-guideline-compass-db
+    plan: free
+    databaseName: ai_guideline_compass
+    user: ai_guideline_compass
+
+services:
+  - type: web
+    name: ai-guideline-compass-backend
+    runtime: docker
+    dockerfilePath: ./backend/Dockerfile
+    dockerContext: ./backend
+    plan: free
+    healthCheckPath: /health
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: ai-guideline-compass-db
+          property: connectionString
+      - key: SECRET_KEY
+        generateValue: true
+      - key: ADMIN_INVITE_CODE
+        generateValue: true
+      - key: CHROMA_PERSIST_DIR
+        value: /app/vector_store_data
+      - key: EMBEDDING_PROVIDER
+        value: tfidf
+      - key: CORS_ORIGINS
+        value: '["https://ai-guideline-compass-frontend.onrender.com"]'
+      - key: ANTHROPIC_API_KEY
+        sync: false
+    disk:
+      name: vector-store-data
+      mountPath: /app/vector_store_data
+      sizeGB: 1
+    preDeployCommand: "PYTHONPATH=. alembic upgrade head"
+
+  - type: web
+    name: ai-guideline-compass-frontend
+    runtime: docker
+    dockerfilePath: ./frontend/Dockerfile
+    dockerContext: ./frontend
+    plan: free
+    dockerBuildContext: ./frontend
+    envVars:
+      - key: VITE_API_BASE_URL
+        value: https://ai-guideline-compass-backend.onrender.com/api/v1
