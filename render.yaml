@@ -26,17 +26,8 @@ services:
         value: /app/vector_store_data
       - key: EMBEDDING_PROVIDER
         value: tfidf
+      # 프론트엔드를 Vercel에 배포한 뒤, 실제 Vercel 도메인으로 이 값을 수정하세요.
       - key: CORS_ORIGINS
-        value: '["https://ai-guideline-compass-frontend.onrender.com"]'
+        value: '["https://YOUR-APP-NAME.vercel.app"]'
       - key: ANTHROPIC_API_KEY
         sync: false
-
-  - type: web
-    name: ai-guideline-compass-frontend
-    runtime: docker
-    dockerfilePath: ./frontend/Dockerfile
-    dockerContext: ./frontend
-    plan: free
-    envVars:
-      - key: VITE_API_BASE_URL
-        value: https://ai-guideline-compass-backend.onrender.com/api/v1
