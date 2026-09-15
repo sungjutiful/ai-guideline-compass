@@ -12,6 +12,7 @@ services:
     dockerContext: ./backend
     plan: free
     healthCheckPath: /health
+    preDeployCommand: "PYTHONPATH=. alembic upgrade head"
     envVars:
       - key: DATABASE_URL
         fromDatabase:
@@ -29,11 +30,6 @@ services:
         value: '["https://ai-guideline-compass-frontend.onrender.com"]'
       - key: ANTHROPIC_API_KEY
         sync: false
-    disk:
-      name: vector-store-data
-      mountPath: /app/vector_store_data
-      sizeGB: 1
-    preDeployCommand: "PYTHONPATH=. alembic upgrade head"
 
   - type: web
     name: ai-guideline-compass-frontend
@@ -41,7 +37,6 @@ services:
     dockerfilePath: ./frontend/Dockerfile
     dockerContext: ./frontend
     plan: free
-    dockerBuildContext: ./frontend
     envVars:
       - key: VITE_API_BASE_URL
         value: https://ai-guideline-compass-backend.onrender.com/api/v1

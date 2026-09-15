@@ -85,6 +85,42 @@ docker compose up --build
 - 백엔드: http://localhost:8000
 - 프론트엔드: http://localhost:5173
 
+## 배포 (Render 무료 플랜)
+
+저장소 루트의 `render.yaml`이 Postgres + 백엔드(Docker) + 프론트엔드(Docker)를
+한 번에 구성하는 Render Blueprint입니다.
+
+1. https://render.com 가입 (신용카드 없이 무료 플랜으로 가능)
+2. Render 대시보드 → **New** → **Blueprint** → 이 GitHub 저장소
+   (`sungjutiful/ai-guideline-compass`)를 연결하고 브랜치를 선택
+3. Render가 `render.yaml`을 읽어 아래 3개 리소스를 보여줍니다. 그대로 **Apply**:
+   - `ai-guideline-compass-db` (Postgres, 무료 플랜)
+   - `ai-guideline-compass-backend` (FastAPI, Docker)
+   - `ai-guideline-compass-frontend` (React 빌드, Nginx, Docker)
+4. 배포 중 `ANTHROPIC_API_KEY` 입력을 요청하면, 챗봇이 자연어 답변을 생성하길
+   원하면 키를 입력하고, 비워두면 조항 인용형 답변으로 자동 동작합니다.
+5. 배포가 끝나면 백엔드/프론트엔드 각각의 실제 URL이 생성됩니다
+   (`ai-guideline-compass-*.onrender.com`이 이미 사용 중이면 Render가 다른
+   이름을 붙일 수 있습니다). 이 경우 두 서비스의 URL이 서로 정확히 일치하도록
+   백엔드의 `CORS_ORIGINS`와 프론트엔드의 `VITE_API_BASE_URL` 환경변수를
+   실제 URL로 수정한 뒤 **Manual Deploy**로 재배포하세요.
+6. 첫 접속 후 회원가입으로 계정을 만들고, 교사 계정으로 가이드라인 문서를
+   업로드하면 서비스를 바로 사용할 수 있습니다. 관리자 계정 가입에는 백엔드
+   서비스의 `ADMIN_INVITE_CODE` 환경변수 값(자동 생성됨, Render 대시보드에서
+   확인 가능)이 필요합니다.
+
+**무료 플랜 제약사항 (알아두세요):**
+- Postgres 무료 플랜은 **생성 후 30일이 지나면 자동 삭제**됩니다. 장기 운영
+  시 유료 플랜으로 전환하거나 만료 전 백업/재생성이 필요합니다.
+- 무료 웹 서비스는 일정 시간 요청이 없으면 슬립 상태가 되며, 첫 요청 시
+  기동에 수십 초가 걸릴 수 있습니다.
+- 가이드라인 벡터 임베딩은 컨테이너 로컬 디스크(`vector_store_data`)에
+  저장되는데, 무료 플랜은 영구 디스크(Persistent Disk)를 지원하지 않아
+  재배포/재시작 시 초기화됩니다. 이 경우 가이드라인 문서를 다시 업로드하면
+  복구됩니다. 운영 환경에서 지속성이 필요하면 Starter 이상 플랜에서 디스크를
+  추가하거나(`render.yaml`에 `disk` 블록 추가), Docker Compose로 자체 서버에
+  배포하는 것을 권장합니다.
+
 ## 가이드라인 챗봇 동작 방식 (RAG)
 
 1. 교사/관리자가 지침 문서를 업로드하면 "제O조" 패턴 기준으로 조항을 분리합니다
